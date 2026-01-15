@@ -43,7 +43,7 @@ def start_telegram_bot():
 # -----------------------------
 # Main Entry Point
 # -----------------------------
-if name == "main":
+if __name__ == "__main__":
     # Run Telegram bot in a separate thread
     bot_thread = threading.Thread(target=start_telegram_bot, daemon=True)
     bot_thread.start()
@@ -51,3 +51,4 @@ if name == "main":
     # Run Flask web server (required for Render free-tier)
     print(f"[INFO] Starting Flask server on port {PORT}...")
     app.run(host="0.0.0.0", port=PORT)
+
