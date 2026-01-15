@@ -1,32 +1,53 @@
-from telethon import TelegramClient, events
-from flask import Flask
-import threading
 import os
-name = "punk"
-api_id = int(os.environ["API_ID"])
-api_hash = os.environ["API_HASH"]
-bot_token = os.environ["BOT_TOKEN"]
+import threading
+from flask import Flask
+from telethon import TelegramClient, events
 
-source_channel = os.environ["SOURCE_CHANNEL"]
-target_channel = os.environ["TARGET_CHANNEL"]
+# -----------------------------
+# Environment Variables
+# -----------------------------
+API_ID = int(os.environ.get("API_ID", 0))
+API_HASH = os.environ.get("API_HASH", "")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+SOURCE_CHANNEL = os.environ.get("SOURCE_CHANNEL", "")
+TARGET_CHANNEL = os.environ.get("TARGET_CHANNEL", "")
+PORT = int(os.environ.get("PORT", 10000))  # For Render free-tier web service
 
+# -----------------------------
+# Flask Web Server (Keep Alive)
+# -----------------------------
 app = Flask(name)
 
 @app.route("/")
 def home():
-    return "Bot is running"
+    return "Telegram Forwarder Bot is running ✅"
 
-def run_bot():
-    client = TelegramClient("bot", api_id, api_hash).start(bot_token=bot_token)
+# -----------------------------
+# Telegram Bot Logic
+# -----------------------------
+def start_telegram_bot():
+    """Initialize and run the Telegram bot"""
+    client = TelegramClient("bot_session", API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
-    @client.on(events.NewMessage(chats=source_channel))
-    async def handler(event):
-        await client.send_message(target_channel, event.message)
+    @client.on(events.NewMessage(chats=SOURCE_CHANNEL))
+    async def forward_message(event):
+        """Forward every new message from source to target channel"""
+        try:
+            await client.send_message(TARGET_CHANNEL, event.message)
+        except Exception as e:
+            print(f"[ERROR] Failed to forward message: {e}")
 
+    print("[INFO] Telegram bot is running...")
     client.run_until_disconnected()
 
+# -----------------------------
+# Main Entry Point
+# -----------------------------
 if name == "main":
-    threading.Thread(target=run_bot).start()
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    # Run Telegram bot in a separate thread
+    bot_thread = threading.Thread(target=start_telegram_bot, daemon=True)
+    bot_thread.start()
 
-
+    # Run Flask web server (required for Render free-tier)
+    print(f"[INFO] Starting Flask server on port {PORT}...")
+    app.run(host="0.0.0.0", port=PORT)
