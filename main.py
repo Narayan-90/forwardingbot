@@ -9,7 +9,7 @@ from telethon import TelegramClient, events
 API_ID = int(os.environ.get("API_ID", 0))
 API_HASH = os.environ.get("API_HASH", "")
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
-SOURCE_CHANNEL = os.environ.get("SOURCE_CHANNEL", "")
+SOURCE_CHANNEL = os.environ.get("https://t.me/hcmbd1", "")
 TARGET_CHANNEL = os.environ.get("TARGET_CHANNEL", "")
 PORT = int(os.environ.get("PORT", 10000))  # For Render free-tier web service
 
@@ -51,4 +51,5 @@ if __name__ == "__main__":
     # Run Flask web server (required for Render free-tier)
     print(f"[INFO] Starting Flask server on port {PORT}...")
     app.run(host="0.0.0.0", port=PORT)
+
 
