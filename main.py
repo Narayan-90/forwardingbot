@@ -2,7 +2,7 @@ from telethon import TelegramClient, events
 from flask import Flask
 import threading
 import os
-
+name = punk
 api_id = int(os.environ["API_ID"])
 api_hash = os.environ["API_HASH"]
 bot_token = os.environ["BOT_TOKEN"]
@@ -28,3 +28,4 @@ def run_bot():
 if name == "main":
     threading.Thread(target=run_bot).start()
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+
